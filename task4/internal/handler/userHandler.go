@@ -3,11 +3,10 @@ package handler
 import (
 	"github.com/gin-gonic/gin"
 	"githubgithub.com/xiuluokillall/go_task/task4/internal/model"
+	"githubgithub.com/xiuluokillall/go_task/task4/pkg/dao"
 	error2 "githubgithub.com/xiuluokillall/go_task/task4/pkg/error"
 	"githubgithub.com/xiuluokillall/go_task/task4/pkg/response"
 	"githubgithub.com/xiuluokillall/go_task/task4/utils"
-	"golang.org/x/crypto/bcrypt"
-	"net/http"
 )
 
 func Register(c *gin.Context) {
@@ -20,16 +19,15 @@ func Register(c *gin.Context) {
 	// 加密密码
 	hashedPassword, err := utils.GenerateFromPassword(user.Password)
 	if err != nil {
-		response.Error(c, error2.ErrInvalidParams)
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to hash password"})
+		response.Fail(c, -1, "密码加密失败")
 		return
 	}
 	user.Password = string(hashedPassword)
-
+	db := dao.GetDb()
 	if err := db.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Failed to create user"})
+		response.Fail(c, -1, "注册用户失败")
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "User registered successfully"})
+	response.Success(c, nil, "success")
 }

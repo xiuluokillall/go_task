@@ -9,7 +9,7 @@ import (
 
 var db *gorm.DB
 
-func getDb() *gorm.DB {
+func GetDb() *gorm.DB {
 	return db
 }
 
