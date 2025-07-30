@@ -21,3 +21,7 @@ func TestQ4(t *testing.T) {
 func TestQ5(t *testing.T) {
 	Q5()
 }
+
+func TestQ6(t *testing.T) {
+	Q6()
+}

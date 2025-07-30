@@ -1,0 +1,11 @@
+server:
+  port: 8088
+mysql:
+  host: 127.0.0.1
+  port: 3306
+  user: ben
+  password: 123456
+  database: blob
+auth:
+  jwt_secret: my_blog_key
+  token_exp: 3600

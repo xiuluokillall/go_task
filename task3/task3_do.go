@@ -26,15 +26,15 @@ func GormConn() (db *gorm.DB) {
 }
 
 // 使用sqlx连接数据库
-func SqlxConn() (db *sqlx.DB, err error) {
+func SqlxConn() (db *sqlx.DB) {
 	dsn := "ben:123456@tcp(127.0.0.1:3306)/test?charset=utf8mb4&parseTime=True&loc=Local"
 	db, innerErr := sqlx.Connect("mysql", dsn)
 	if innerErr != nil {
-		return nil, innerErr
+		panic("connect database error:" + innerErr.Error())
 	}
 	db.SetMaxOpenConns(20)
 	db.SetMaxIdleConns(5)
-	return db, nil
+	return db
 }
 
 type Student struct {
@@ -158,12 +158,65 @@ func Q5() {
 }
 
 type Employee struct {
-	Id         int
-	Name       string
-	Department string
-	Salary     float64
+	Id         int     `db:"id"`
+	Name       string  `db:"name"`
+	Department string  `db:"department"`
+	Salary     float64 `db:"salary"`
 }
 
+/*
+题目1：使用SQL扩展库进行查询
+假设你已经使用Sqlx连接到一个数据库，并且有一个 employees 表，包含字段 id 、 name 、 department 、 salary 。
+要求 ：
+编写Go代码，使用Sqlx查询 employees 表中所有部门为 "技术部" 的员工信息，并将结果映射到一个自定义的 Employee 结构体切片中。
+编写Go代码，使用Sqlx查询 employees 表中工资最高的员工信息，并将结果映射到一个 Employee 结构体中。
+*/
 func Q6() {
+	db := SqlxConn()
+	schema := "CREATE TABLE IF NOT EXISTS employees (   " +
+		" id INT AUTO_INCREMENT PRIMARY KEY," +
+		"    name VARCHAR(50) NOT NULL," +
+		"   department VARCHAR(50) NOT NULL," +
+		"    salary decimal(9,2) NOT NULL" +
+		") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4"
+	createRes, err := db.Exec(schema)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(createRes.RowsAffected())
+	insertRes, inErr := db.Exec("insert into employees(name, department, salary) values ('zhangsan','技术部',8000)")
+	if inErr != nil {
+		panic(inErr)
+	}
+	fmt.Println(insertRes.RowsAffected())
+	var employees []Employee
+	db.Select(&employees, "select * from employees where department = ?", "技术部")
+	fmt.Println(employees)
+}
 
+func Q7() {
+	db := SqlxConn()
+	query := &Employee{}
+	db.Select(query, "select * from employees order by salary desc limit 1")
+}
+
+/*
+题目2：实现类型安全映射
+假设有一个 books 表，包含字段 id 、 title 、 author 、 price 。
+要求 ：
+定义一个 Book 结构体，包含与 books 表对应的字段。
+编写Go代码，使用Sqlx执行一个复杂的查询，例如查询价格大于 50 元的书籍，并将结果映射到 Book 结构体切片中，确保类型安全。
+*/
+type Book struct {
+	Id     int     `db:"id"`
+	Title  string  `db:"title"`
+	Author string  `db:"author"`
+	Price  float64 `db:"price"`
+}
+
+func Q8() []Book {
+	db := SqlxConn()
+	query := &[]Book{}
+	db.Select(query, "select * from books where price > 50 order by price desc")
+	return *query
 }
