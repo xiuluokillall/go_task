@@ -7,13 +7,9 @@ import (
 	"gorm.io/gorm"
 )
 
-var db *gorm.DB
+var DB *gorm.DB
 
-func GetDb() *gorm.DB {
-	return db
-}
-
-func InitMysqlDb() *gorm.DB {
+func InitMysqlDb() {
 	mysqlConfig := config.GetConfig().MySQL
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlConfig.User,
@@ -21,7 +17,8 @@ func InitMysqlDb() *gorm.DB {
 		mysqlConfig.Host,
 		mysqlConfig.Port,
 		mysqlConfig.Database)
-	db, err := gorm.Open(mysql.New(mysql.Config{
+	var err error
+	DB, err = gorm.Open(mysql.New(mysql.Config{
 		DSN:               dsn,
 		DefaultStringSize: 256, //string类型默认长度
 		//DisableDatetimePrecision:  true,  //禁用 datetime 精度，MySQL 5.6 之前的数据库不支持
@@ -32,5 +29,4 @@ func InitMysqlDb() *gorm.DB {
 	if err != nil {
 		panic(err)
 	}
-	return db
 }

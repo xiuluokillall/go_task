@@ -10,8 +10,6 @@ import (
 	"githubgithub.com/xiuluokillall/go_task/task4/utils"
 )
 
-var db = dao.GetDb()
-
 func Register(c *gin.Context) {
 	var userParam model.UserParam
 	if err := c.ShouldBindJSON(&userParam); err != nil {
@@ -29,7 +27,7 @@ func Register(c *gin.Context) {
 		UserName: userParam.UserName,
 		Password: hashedPassword,
 	}
-	if err := db.Create(&user).Error; err != nil {
+	if err := dao.DB.Create(&user).Error; err != nil {
 		response.Fail(c, -1, "注册用户失败")
 		return
 	}
@@ -45,7 +43,7 @@ func Login(c *gin.Context) {
 	}
 
 	loginUser := &model.User{}
-	result := db.Where("username = ?", userParam.UserName).First(loginUser)
+	result := dao.DB.Where("username = ?", userParam.UserName).First(loginUser)
 	if result.Error != nil || result.RowsAffected == 0 {
 		response.Fail(c, -1, "登录失败 用户名密码错误")
 	}
