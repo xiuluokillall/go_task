@@ -10,7 +10,7 @@ import (
 
 var (
 	once     sync.Once
-	instance *Configuration
+	instance = &Configuration{}
 )
 
 type Configuration struct {
@@ -45,6 +45,7 @@ func InitConfig(Path string) {
 }
 
 func LoadConfig(path string) error {
+	//instance := &Configuration{}
 	file, err := os.Open(path)
 	if err != nil {
 		return fmt.Errorf("加载全局配置文件失败: %w", err)

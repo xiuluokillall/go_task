@@ -15,7 +15,7 @@ func GetDb() *gorm.DB {
 
 func InitMysqlDb() *gorm.DB {
 	mysqlConfig := config.GetConfig().MySQL
-	dsn := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?charset=utf8mb4&parseTime=True&loc=Local",
+	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local",
 		mysqlConfig.User,
 		mysqlConfig.Password,
 		mysqlConfig.Host,
